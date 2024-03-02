@@ -1,5 +1,11 @@
 """Main module for markdown generation."""
 
+# CHANGES 2 Feb 24:
+#  - Added References: to _RE_BLOCKSTART_LIST
+#  - Detect whether the line has a url. If so, do not consider the line
+#    as a "arg" line, which is what happens when ":" is in the line!!
+
+
 import datetime
 import importlib
 import importlib.util
@@ -21,7 +27,7 @@ _RE_BLOCKSTART_TEXT = re.compile(r"(Examples:|Example:|Todo:).{0,2}$", re.IGNORE
 
 _RE_QUOTE_TEXT = re.compile(r"(Notes:|Note:).{0,2}$", re.IGNORECASE)
 
-_RE_TYPED_ARGSTART = re.compile(r"(([\w\[\]_]{1,}?)\s*?\((.*?)\):){1}(.{2,})", re.IGNORECASE)
+_RE_TYPED_ARGSTART = re.compile(r"([\w\[\]_]{1,}?)\s*?\((.*?)\):(.{2,})", re.IGNORECASE)
 _RE_ARGSTART = re.compile(r"(.{1,}?):(.{2,})", re.IGNORECASE)
 
 _IGNORE_GENERATION_INSTRUCTION = "lazydocs: ignore"
@@ -220,7 +226,7 @@ def to_md_file(
         return
 
     md_file = filename
-    
+
     if is_mdx:
         if not filename.endswith(".mdx"):
             md_file = filename + ".mdx"
@@ -368,6 +374,9 @@ def _doc2md(obj: Any) -> str:
     md_code_snippet = False
     quote_block = False
 
+    def has_url(line):
+        return ('http:' in line) or ('https:' in line)
+
     for line in doc.split("\n"):
         indent = len(line) - len(line.lstrip())
         if not md_code_snippet and not literal_block:
@@ -427,7 +436,7 @@ def _doc2md(obj: Any) -> str:
                     + _RE_TYPED_ARGSTART.sub(r"<b>`\1`</b> (\2): \3", line)
                 )
                 argindent = indent
-            elif arg_list and not literal_block and _RE_ARGSTART.match(line):
+            elif arg_list and not literal_block and _RE_ARGSTART.match(line) and not has_url(line):
                 # start of an exception-type block
                 out.append(
                     "\n"
@@ -614,7 +623,7 @@ class MarkdownGenerator(object):
         if path:
             if is_mdx:
                 markdown = _MDX_SOURCE_BADGE_TEMPLATE.format(path=path) + markdown
-            else:    
+            else:
                 markdown = _SOURCE_BADGE_TEMPLATE.format(path=path) + markdown
 
         return markdown
