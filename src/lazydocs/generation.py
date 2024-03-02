@@ -13,7 +13,7 @@ from pydoc import locate
 from typing import Any, Callable, Dict, List, Optional
 
 _RE_BLOCKSTART_LIST = re.compile(
-    r"(Args:|Arg:|Arguments:|Parameters:|Kwargs:|Attributes:|Returns:|Yields:|Kwargs:|Raises:).{0,2}$",
+    r"(Args:|Arg:|Arguments:|Parameters:|Kwargs:|Attributes:|Returns:|Yields:|Kwargs:|Raises:|References:).{0,2}$",
     re.IGNORECASE,
 )
 
@@ -21,7 +21,7 @@ _RE_BLOCKSTART_TEXT = re.compile(r"(Examples:|Example:|Todo:).{0,2}$", re.IGNORE
 
 _RE_QUOTE_TEXT = re.compile(r"(Notes:|Note:).{0,2}$", re.IGNORECASE)
 
-_RE_TYPED_ARGSTART = re.compile(r"([\w\[\]_]{1,}?)\s*?\((.*?)\):(.{2,})", re.IGNORECASE)
+_RE_TYPED_ARGSTART = re.compile(r"(([\w\[\]_]{1,}?)\s*?\((.*?)\):){1}(.{2,})", re.IGNORECASE)
 _RE_ARGSTART = re.compile(r"(.{1,}?):(.{2,})", re.IGNORECASE)
 
 _IGNORE_GENERATION_INSTRUCTION = "lazydocs: ignore"
