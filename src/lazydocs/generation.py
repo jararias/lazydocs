@@ -1039,13 +1039,18 @@ def generate_docs(
 
             module_name = os.path.basename(path)
 
-            spec = importlib.util.spec_from_file_location(
-                module_name,
-                path,
-            )
-            assert spec is not None
-            mod = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(mod)  # type: ignore
+            try:
+                spec = importlib.util.spec_from_file_location(
+                    module_name,
+                    path,
+                )
+                assert spec is not None
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)  # type: ignore
+            except ModuleNotFoundError:
+                package = os.path.dirname(path).replace(os.path.rep, '.')
+                module = f'.{os.path.splitext(module_name)[0]}'
+                mod = importlib.import_module(module, package)
 
             if mod:
                 module_md = generator.module2md(mod, is_mdx=is_mdx)
