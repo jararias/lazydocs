@@ -1048,7 +1048,7 @@ def generate_docs(
                 mod = importlib.util.module_from_spec(spec)
                 spec.loader.exec_module(mod)  # type: ignore
             except ModuleNotFoundError:
-                package = os.path.dirname(path).replace(os.path.rep, '.')
+                package = os.path.dirname(path).replace(os.path.sep, '.')
                 module = f'.{os.path.splitext(module_name)[0]}'
                 mod = importlib.import_module(module, package)
 
